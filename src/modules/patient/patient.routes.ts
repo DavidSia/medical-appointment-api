@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { createPatientController, getPatientController } from './patient.controller'
-import { createPatientSchema, patientParamsSchema } from './patient.schema'
+import { createPatientSchema, patientErrorSchema, patientParamsSchema, patientResponseSchema } from './patient.schema'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 export async function patientRoutes(app: FastifyInstance) {
@@ -12,36 +12,8 @@ export async function patientRoutes(app: FastifyInstance) {
         tags: ['Pacientes'],
         body: createPatientSchema,
         response: {
-          201: {
-            description: 'Paciente criado com sucesso',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string', format: 'uuid' },
-                  name: { type: 'string' },
-                  email: { type: 'string', format: 'email' },
-                  phone: { type: 'string' },
-                },
-              },
-            },
-          },
-          409: {
-            description: 'Paciente já existe com este email',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string' },
-                  message: { type: 'string' },
-                },
-              },
-            },
-          },
+          201: patientResponseSchema,
+          409: patientErrorSchema,
         },
       },
     },

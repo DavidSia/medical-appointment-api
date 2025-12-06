@@ -15,6 +15,24 @@ export const patientQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).optional().default(10),
 })
 
+export const patientResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string().email(),
+    phone: z.string(),
+  }),
+})
+
+export const patientErrorSchema = z.object({
+  success: z.boolean(),
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+  }),
+})
+
 export type CreatePatientInput = z.infer<typeof createPatientSchema>
 export type PatientParams = z.infer<typeof patientParamsSchema>
 export type PatientQuery = z.infer<typeof patientQuerySchema>
