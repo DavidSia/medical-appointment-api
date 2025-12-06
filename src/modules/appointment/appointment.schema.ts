@@ -1,20 +1,63 @@
 import { z } from 'zod'
 
+// Schemas existentes
 export const createAppointmentSchema = z.object({
-  patientId: z.string().uuid('ID do paciente inválido'),
-  doctorId: z.string().uuid('ID do médico inválido'),
-  appointmentAt: z.string().datetime({ message: 'Data/hora inválida. Use formato ISO 8601' }),
+  patientId: z.string().uuid(),
+  doctorId: z.string().uuid(),
+  appointmentAt: z.string(),
 })
 
 export const appointmentParamsSchema = z.object({
-  appointmentId: z.string().uuid('ID do agendamento inválido'),
-})
-
-export const appointmentQuerySchema = z.object({
-  page: z.coerce.number().min(1).optional().default(1),
-  limit: z.coerce.number().min(1).max(100).optional().default(10),
+  appointmentId: z.string().uuid(),
 })
 
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>
-export type AppointmentParams = z.infer<typeof appointmentParamsSchema>
-export type AppointmentQuery = z.infer<typeof appointmentQuerySchema>
+
+// Response schemas
+export const errorResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+  }),
+})
+
+export const appointmentResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    id: z.string().uuid(),
+    date: z.string(),
+    time: z.string(),
+    status: z.string(),
+    patient: z.object({
+      id: z.string(),
+      name: z.string(),
+      email: z.string(),
+    }),
+    doctor: z.object({
+      id: z.string(),
+      name: z.string(),
+      specialty: z.string(),
+      price: z.string(),
+    }),
+  }),
+})
+
+export const cancelAppointmentResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    id: z.string().uuid(),
+    date: z.string(),
+    time: z.string(),
+    status: z.string(),
+    patient: z.object({
+      id: z.string(),
+      name: z.string(),
+    }),
+    doctor: z.object({
+      id: z.string(),
+      name: z.string(),
+      specialty: z.string(),
+    }),
+  }),
+})
