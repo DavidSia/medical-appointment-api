@@ -7,7 +7,9 @@ import {
   serializerCompiler,
   validatorCompiler,
   ZodTypeProvider,
+  jsonSchemaTransform,
 } from 'fastify-type-provider-zod'
+import { z } from 'zod'
 
 import { errorHandler } from './shared/middlewares'
 import { patientRoutes } from './modules/patient'
@@ -30,7 +32,7 @@ export async function buildApp() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })
 
-  // Configurar Swagger
+  // Configurar Swagger com transform para Zod
   await app.register(swagger, {
     openapi: {
       info: {
@@ -51,6 +53,7 @@ export async function buildApp() {
         { name: 'Agendamentos', description: 'Endpoints de agendamentos' },
       ],
     },
+    transform: jsonSchemaTransform,
   })
 
   // Configurar Swagger UI
@@ -80,13 +83,10 @@ export async function buildApp() {
       description: 'Health check',
       tags: ['Health'],
       response: {
-        200: {
-          type: 'object',
-          properties: {
-            status: { type: 'string' },
-            timestamp: { type: 'string' },
-          },
-        },
+        200: z.object({
+          status: z.string(),
+          timestamp: z.string(),
+        }),
       },
     },
   }, async () => {
