@@ -1,6 +1,11 @@
 import { FastifyInstance } from 'fastify'
 import { createAgendaController } from './agenda.controller'
-import { createAgendaSchema, agendaParamsSchema } from './agenda.schema'
+import {
+  createAgendaSchema,
+  agendaParamsSchema,
+  agendaResponseSchema,
+  errorResponseSchema,
+} from './agenda.schema'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 export async function agendaRoutes(app: FastifyInstance) {
@@ -13,54 +18,9 @@ export async function agendaRoutes(app: FastifyInstance) {
         params: agendaParamsSchema,
         body: createAgendaSchema,
         response: {
-          201: {
-            description: 'Agenda criada com sucesso',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              data: {
-                type: 'object',
-                properties: {
-                  id: { type: 'string', format: 'uuid' },
-                  doctorId: { type: 'string', format: 'uuid' },
-                  availableFromWeekDay: { type: 'number' },
-                  availableToWeekDay: { type: 'number' },
-                  availableFromTime: { type: 'string' },
-                  availableToTime: { type: 'string' },
-                  weekDayRange: { type: 'string' },
-                  timeRange: { type: 'string' },
-                },
-              },
-            },
-          },
-          404: {
-            description: 'Médico não encontrado',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string' },
-                  message: { type: 'string' },
-                },
-              },
-            },
-          },
-          409: {
-            description: 'Conflito com agenda existente',
-            type: 'object',
-            properties: {
-              success: { type: 'boolean' },
-              error: {
-                type: 'object',
-                properties: {
-                  code: { type: 'string' },
-                  message: { type: 'string' },
-                },
-              },
-            },
-          },
+          201: agendaResponseSchema,
+          404: errorResponseSchema,
+          409: errorResponseSchema,
         },
       },
     },
