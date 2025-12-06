@@ -1,11 +1,13 @@
 import { FastifyInstance } from 'fastify'
-import { createAppointmentController, cancelAppointmentController } from './appointment.controller'
+import { createAppointmentController, cancelAppointmentController, listAppointmentsController } from './appointment.controller'
 import {
   createAppointmentSchema,
   appointmentParamsSchema,
   appointmentResponseSchema,
   cancelAppointmentResponseSchema,
   errorResponseSchema,
+  appointmentQuerySchema,
+  appointmentsListResponseSchema,
 } from './appointment.schema'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
@@ -43,5 +45,20 @@ export async function appointmentRoutes(app: FastifyInstance) {
       },
     },
     cancelAppointmentController
+  )
+
+  app.withTypeProvider<ZodTypeProvider>().get(
+    '/appointments',
+    {
+      schema: {
+        description: 'Listar agendamentos com paginação',
+        tags: ['Agendamentos'],
+        querystring: appointmentQuerySchema,
+        response: {
+          200: appointmentsListResponseSchema,
+        },
+      },
+    },
+    listAppointmentsController
   )
 }

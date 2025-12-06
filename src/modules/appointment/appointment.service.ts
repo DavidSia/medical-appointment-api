@@ -192,3 +192,71 @@ export async function cancelAppointment(appointmentId: string) {
     },
   }
 }
+
+export async function listAppointments(page: number, limit: number) {
+  const skip = (page - 1) * limit
+
+  const [appointments, total] = await Promise.all([
+    prisma.appointment.findMany({
+      skip,
+      take: limit,
+      include: {
+        patient: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            specialty: true,
+            appointmentPrice: true,
+          },
+        },
+      },
+      orderBy: { appointmentAt: 'desc' },
+    }),
+    prisma.appointment.count(),
+  ])
+
+  const formattedAppointments = appointments.map((appointment) => ({
+    id: appointment.id,
+    date: formatDate(appointment.appointmentAt),
+    time: formatTime(appointment.appointmentAt),
+    status: formatStatus(appointment.status),
+    patient: {
+      id: appointment.patient.id,
+      name: appointment.patient.name,
+      email: appointment.patient.email,
+    },
+    doctor: {
+      id: appointment.doctor.id,
+      name: appointment.doctor.name,
+      specialty: appointment.doctor.specialty,
+      price: formatPrice(appointment.doctor.appointmentPrice),
+    },
+  }))
+
+  return {
+    data: formattedAppointments,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
+}
+
+function formatStatus(status: string): string {
+  const statusMap: Record<string, string> = {
+    SCHEDULED: 'Agendado',
+    IN_PROGRESS: 'Em Consulta',
+    FINISHED: 'Finalizado',
+    CANCELED: 'Cancelado',
+  }
+  return statusMap[status] || status
+}
