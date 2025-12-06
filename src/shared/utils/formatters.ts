@@ -1,3 +1,5 @@
+import { Decimal } from "@prisma/client/runtime/library"
+
 const MONTHS = [
   'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
   'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
@@ -25,8 +27,16 @@ export function formatTime(date: Date): string {
 /**
  * Formata valor para o padrão: "R$ 100,00"
  */
-export function formatPrice(value: number | string): string {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value
+export function formatPrice(value: number | string | Decimal): string {
+  let numValue: number
+
+  if (value instanceof Decimal) {
+    numValue = value.toNumber()
+  } else if (typeof value === 'string') {
+    numValue = parseFloat(value)
+  } else {
+    numValue = value
+  }
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
