@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
-import { Decimal } from '@prisma/client/runtime/library'
 import { env } from '../../config/env'
 import { formatDate, formatTime, formatPrice } from '../utils/formatters'
+import { Decimal } from '@prisma/client/runtime/library'
 
 interface SendAppointmentConfirmationParams {
   patientName: string
@@ -73,6 +73,14 @@ export async function sendAppointmentConfirmationEmail(
               <span class="info-label">🏥 Especialidade:</span>
               <span class="info-value">${specialty}</span>
             </div>
+            <div class="info-row">
+              <span class="info-label">🏢 Clínica:</span>
+              <span class="info-value">${env.CLINIC_NAME}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">📍 Endereço:</span>
+              <span class="info-value">${env.CLINIC_ADDRESS}</span>
+            </div>
             <div class="info-row" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
               <span class="info-label">💰 Valor:</span>
               <span class="info-value"><strong>${formattedPrice}</strong></span>
@@ -81,6 +89,10 @@ export async function sendAppointmentConfirmationEmail(
           
           <p>⚠️ <strong>Importante:</strong> Caso precise cancelar, faça-o com pelo menos 2 horas de antecedência.</p>
           <p>Até breve!</p>
+        </div>
+        <div class="footer">
+          <p>${env.CLINIC_NAME}</p>
+          <p>${env.CLINIC_ADDRESS}</p>
         </div>
       </div>
     </body>
@@ -96,16 +108,19 @@ export async function sendAppointmentConfirmationEmail(
     🕐 Horário: ${formattedTime}
     👨‍⚕️ Médico: ${doctorName}
     🏥 Especialidade: ${specialty}
+    🏢 Clínica: ${env.CLINIC_NAME}
+    📍 Endereço: ${env.CLINIC_ADDRESS}
     💰 Valor: ${formattedPrice}
 
     ⚠️ Importante: Caso precise cancelar, faça-o com pelo menos 2 horas de antecedência.
 
     Até breve!
+    ${env.CLINIC_NAME}
   `
 
   try {
     await transporter.sendMail({
-      from: `"<${env.MAIL_FROM}>`,
+      from: `"${env.CLINIC_NAME}" <${env.MAIL_FROM}>`,
       to: patientEmail,
       subject: `Consulta Confirmada - ${formattedDate} às ${formattedTime}`,
       text,
