@@ -67,10 +67,12 @@ export async function buildApp() {
   app.setErrorHandler(errorHandler)
 
   // Registrar rotas
-  await app.register(patientRoutes)
-  await app.register(doctorRoutes)
-  await app.register(agendaRoutes)
-  await app.register(appointmentRoutes)
+  await app.register(async (api) => {
+    await api.register(patientRoutes)
+    await api.register(doctorRoutes)
+    await api.register(agendaRoutes)
+    await api.register(appointmentRoutes)
+  }, { prefix: '/api' })
 
   // Rota de health check
   app.get('/health', {
