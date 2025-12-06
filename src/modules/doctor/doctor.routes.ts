@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
-import { createDoctorController } from './doctor.controller'
-import { createDoctorSchema, doctorResponseSchema, errorResponseSchema } from './doctor.schema'
+import { createDoctorController, listDoctorsController } from './doctor.controller'
+import { createDoctorSchema, doctorQuerySchema, doctorResponseSchema, doctorsListResponseSchema, errorResponseSchema } from './doctor.schema'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
 export async function doctorRoutes(app: FastifyInstance) {
@@ -18,5 +18,20 @@ export async function doctorRoutes(app: FastifyInstance) {
       },
     },
     createDoctorController
+  )
+
+  app.withTypeProvider<ZodTypeProvider>().get(
+    '/doctors',
+    {
+      schema: {
+        description: 'Listar médicos com paginação',
+        tags: ['Médicos'],
+        querystring: doctorQuerySchema,
+        response: {
+          200: doctorsListResponseSchema,
+        },
+      },
+    },
+    listDoctorsController
   )
 }

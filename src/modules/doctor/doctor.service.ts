@@ -35,3 +35,39 @@ export async function getDoctorById(doctorId: string) {
 
   return doctor
 }
+
+export async function listDoctors(page: number, limit: number) {
+  const skip = (page - 1) * limit
+
+  const [doctors, total] = await Promise.all([
+    prisma.doctor.findMany({
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        specialty: true,
+        appointmentPrice: true,
+      },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.doctor.count(),
+  ])
+
+  const formattedDoctors = doctors.map((doctor) => ({
+    id: doctor.id,
+    name: doctor.name,
+    specialty: doctor.specialty,
+    appointmentPrice: formatPrice(doctor.appointmentPrice),
+  }))
+
+  return {
+    data: formattedDoctors,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
+}

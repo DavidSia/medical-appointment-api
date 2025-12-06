@@ -36,3 +36,19 @@ export const doctorResponseSchema = z.object({
     specialty: z.string(),
   }),
 })
+
+export const doctorsListResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    specialty: z.string(),
+    appointmentPrice: z.string(),
+  })),
+  pagination: z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
+})
