@@ -1,3 +1,4 @@
+import { Decimal } from '@prisma/client/runtime/library'
 import { prisma } from '../../config/prisma'
 import { ConflictError, NotFoundError } from '../../shared/errors'
 import { formatDate, formatTime, formatPrice } from '../../shared/utils'
@@ -10,7 +11,7 @@ interface AppointmentWithDoctor {
   doctor: {
     name: string
     specialty: string
-    appointmentPrice: number | string
+    appointmentPrice: number | string | Decimal
   }
 }
 
@@ -93,4 +94,33 @@ function formatStatus(status: string): string {
     CANCELED: 'Cancelado',
   }
   return statusMap[status] || status
+}
+
+export async function listPatients(page: number, limit: number) {
+  const skip = (page - 1) * limit
+
+  const [patients, total] = await Promise.all([
+    prisma.patient.findMany({
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+      },
+      orderBy: { name: 'asc' },
+    }),
+    prisma.patient.count(),
+  ])
+
+  return {
+    data: patients,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
 }

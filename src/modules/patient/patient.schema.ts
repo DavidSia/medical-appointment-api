@@ -15,6 +15,19 @@ export const patientQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).optional().default(10),
 })
 
+export type CreatePatientInput = z.infer<typeof createPatientSchema>
+export type PatientParams = z.infer<typeof patientParamsSchema>
+export type PatientQuery = z.infer<typeof patientQuerySchema>
+
+// Response schemas
+export const errorResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+  }),
+})
+
 export const patientResponseSchema = z.object({
   success: z.boolean(),
   data: z.object({
@@ -25,14 +38,39 @@ export const patientResponseSchema = z.object({
   }),
 })
 
-export const patientErrorSchema = z.object({
+export const patientWithAppointmentsResponseSchema = z.object({
   success: z.boolean(),
-  error: z.object({
-    code: z.string(),
-    message: z.string(),
+  data: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string(),
+    phone: z.string(),
+    appointments: z.array(z.object({
+      id: z.string(),
+      date: z.string(),
+      time: z.string(),
+      status: z.string(),
+      doctor: z.object({
+        name: z.string(),
+        specialty: z.string(),
+        price: z.string(),
+      }),
+    })),
   }),
 })
 
-export type CreatePatientInput = z.infer<typeof createPatientSchema>
-export type PatientParams = z.infer<typeof patientParamsSchema>
-export type PatientQuery = z.infer<typeof patientQuerySchema>
+export const patientsListResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    email: z.string(),
+    phone: z.string(),
+  })),
+  pagination: z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
+})

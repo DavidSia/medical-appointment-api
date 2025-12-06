@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { createPatient, getPatientById } from './patient.service'
-import { CreatePatientInput, PatientParams } from './patient.schema'
+import { createPatient, getPatientById, listPatients } from './patient.service'
+import { CreatePatientInput, PatientParams, PatientQuery } from './patient.schema'
 
 export async function createPatientController(
   request: FastifyRequest<{ Body: CreatePatientInput }>,
@@ -24,5 +24,18 @@ export async function getPatientController(
   return reply.status(200).send({
     success: true,
     data: patient,
+  })
+}
+
+export async function listPatientsController(
+  request: FastifyRequest<{ Querystring: PatientQuery }>,
+  reply: FastifyReply
+) {
+  const { page, limit } = request.query
+  const result = await listPatients(page, limit)
+
+  return reply.status(200).send({
+    success: true,
+    ...result,
   })
 }
