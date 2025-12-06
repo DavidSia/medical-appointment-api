@@ -18,3 +18,21 @@ export const doctorQuerySchema = z.object({
 export type CreateDoctorInput = z.infer<typeof createDoctorSchema>
 export type DoctorParams = z.infer<typeof doctorParamsSchema>
 export type DoctorQuery = z.infer<typeof doctorQuerySchema>
+
+// Response schemas
+export const errorResponseSchema = z.object({
+  success: z.boolean(),
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+  }),
+})
+
+export const doctorResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.object({
+    id: z.string().uuid(),
+    name: z.string(),
+    specialty: z.string(),
+  }),
+})
