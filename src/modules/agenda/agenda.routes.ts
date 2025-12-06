@@ -1,10 +1,12 @@
 import { FastifyInstance } from 'fastify'
-import { createAgendaController } from './agenda.controller'
+import { createAgendaController, listAgendasController } from './agenda.controller'
 import {
   createAgendaSchema,
   agendaParamsSchema,
   agendaResponseSchema,
   errorResponseSchema,
+  agendaQuerySchema,
+  agendasListResponseSchema,
 } from './agenda.schema'
 import { ZodTypeProvider } from 'fastify-type-provider-zod'
 
@@ -25,5 +27,20 @@ export async function agendaRoutes(app: FastifyInstance) {
       },
     },
     createAgendaController
+  )
+
+  app.withTypeProvider<ZodTypeProvider>().get(
+    '/agendas',
+    {
+      schema: {
+        description: 'Listar agendas com paginação',
+        tags: ['Agenda'],
+        querystring: agendaQuerySchema,
+        response: {
+          200: agendasListResponseSchema,
+        },
+      },
+    },
+    listAgendasController
   )
 }

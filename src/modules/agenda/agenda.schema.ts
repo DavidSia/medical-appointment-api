@@ -36,3 +36,34 @@ export const agendaResponseSchema = z.object({
     timeRange: z.string(),
   }),
 })
+
+export const agendaQuerySchema = z.object({
+  page: z.coerce.number().min(1).optional().default(1),
+  limit: z.coerce.number().min(1).max(100).optional().default(10),
+})
+
+export type AgendaQuery = z.infer<typeof agendaQuerySchema>
+
+export const agendasListResponseSchema = z.object({
+  success: z.boolean(),
+  data: z.array(z.object({
+    id: z.string().uuid(),
+    weekDayRange: z.string(),
+    timeRange: z.string(),
+    availableFromWeekDay: z.number(),
+    availableToWeekDay: z.number(),
+    availableFromTime: z.string(),
+    availableToTime: z.string(),
+    doctor: z.object({
+      id: z.string(),
+      name: z.string(),
+      specialty: z.string(),
+    }),
+  })),
+  pagination: z.object({
+    page: z.number(),
+    limit: z.number(),
+    total: z.number(),
+    totalPages: z.number(),
+  }),
+})

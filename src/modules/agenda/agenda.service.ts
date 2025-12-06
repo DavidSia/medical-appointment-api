@@ -1,6 +1,6 @@
 import { prisma } from '../../config/prisma'
 import { ConflictError, NotFoundError } from '../../shared/errors'
-import { timeToMinutes } from '../../shared/utils'
+import { formatTimeRange, timeToMinutes } from '../../shared/utils'
 import { CreateAgendaInput } from './agenda.schema'
 import { Agenda } from '../../shared/types'
 
@@ -161,4 +161,51 @@ function formatWeekDayRange(from: number, to: number): string {
 function formatTimeDisplay(time: string): string {
   const [hours, minutes] = time.split(':')
   return `${hours}h${minutes !== '00' ? minutes : ''}`
+}
+
+export async function listAgendas(page: number, limit: number) {
+  const skip = (page - 1) * limit
+
+  const [agendas, total] = await Promise.all([
+    prisma.agenda.findMany({
+      skip,
+      take: limit,
+      include: {
+        doctor: {
+          select: {
+            id: true,
+            name: true,
+            specialty: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.agenda.count(),
+  ])
+
+  const formattedAgendas = agendas.map((agenda) => ({
+    id: agenda.id,
+    weekDayRange: formatWeekDayRange(agenda.availableFromWeekDay, agenda.availableToWeekDay),
+    timeRange: formatTimeRange(agenda.availableFromTime, agenda.availableToTime),
+    availableFromWeekDay: agenda.availableFromWeekDay,
+    availableToWeekDay: agenda.availableToWeekDay,
+    availableFromTime: agenda.availableFromTime,
+    availableToTime: agenda.availableToTime,
+    doctor: {
+      id: agenda.doctor.id,
+      name: agenda.doctor.name,
+      specialty: agenda.doctor.specialty,
+    },
+  }))
+
+  return {
+    data: formattedAgendas,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  }
 }

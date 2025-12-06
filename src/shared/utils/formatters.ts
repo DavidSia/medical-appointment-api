@@ -78,3 +78,22 @@ export function isTimeInRange(time: string, fromTime: string, toTime: string): b
 export function dateToTimeString(date: Date): string {
   return date.toTimeString().slice(0, 8)
 }
+
+
+const WEEK_DAYS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
+
+/**
+ * Formata range de dias da semana: "Segunda a Sexta"
+ */
+export function formatWeekDayRange(from: number, to: number): string {
+  return `${WEEK_DAYS[from]} a ${WEEK_DAYS[to]}`
+}
+
+/**
+ * Formata range de horário: "08:00 às 18:00"
+ */
+export function formatTimeRange(from: string, to: string): string {
+  const fromFormatted = from.slice(0, 5)
+  const toFormatted = to.slice(0, 5)
+  return `${fromFormatted} às ${toFormatted}`
+}

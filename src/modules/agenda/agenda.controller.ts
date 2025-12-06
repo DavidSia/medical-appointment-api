@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { createAgenda } from './agenda.service'
-import { CreateAgendaInput, AgendaParams } from './agenda.schema'
+import { createAgenda, listAgendas } from './agenda.service'
+import { CreateAgendaInput, AgendaParams, AgendaQuery } from './agenda.schema'
 
 export async function createAgendaController(
   request: FastifyRequest<{ Params: AgendaParams; Body: CreateAgendaInput }>,
@@ -12,5 +12,18 @@ export async function createAgendaController(
   return reply.status(201).send({
     success: true,
     data: agenda,
+  })
+}
+
+export async function listAgendasController(
+  request: FastifyRequest<{ Querystring: AgendaQuery }>,
+  reply: FastifyReply
+) {
+  const { page, limit } = request.query
+  const result = await listAgendas(page, limit)
+
+  return reply.status(200).send({
+    success: true,
+    ...result,
   })
 }
