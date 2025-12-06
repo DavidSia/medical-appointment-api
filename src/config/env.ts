@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { z } from 'zod'
 
 const envSchema = z.object({
@@ -9,8 +10,6 @@ const envSchema = z.object({
   MAIL_USER: z.string().default(''),
   MAIL_PASS: z.string().default(''),
   MAIL_FROM: z.string().default('noreply@clinica.com.br'),
-  CLINIC_NAME: z.string().default('Clínica Saúde Total'),
-  CLINIC_ADDRESS: z.string().default('Av. Paulista, 1000 - São Paulo, SP'),
 })
 
 const _env = envSchema.safeParse(process.env)
