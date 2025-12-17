@@ -379,7 +379,7 @@ npm run db:seed
 
 ## 👤 Autor
 
-Desenvolvido por David para o desafio técnico ClickIP.
+Desenvolvido por David.
 
 ## 📜 Licença
 
